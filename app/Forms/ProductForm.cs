@@ -25,7 +25,7 @@ internal sealed class ProductForm : Form
     {
         _session = session;
         _warningLeadTime = warningLeadTime;
-        _catalogView = new ProductCatalogControl(session.UserName);
+        _catalogView = new ProductCatalogControl();
         _catalogController = new ProductCatalogController(productsService, _catalogView);
         _catalogController.SessionEnded += CatalogController_SessionEnded;
 

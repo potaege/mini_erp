@@ -15,7 +15,7 @@ internal sealed class ProductCatalogControl : UserControl
 
     public string SearchTerm => _searchControl.SearchTerm;
 
-    public ProductCatalogControl(string userName)
+    public ProductCatalogControl()
     {
         Dock = DockStyle.Fill;
         BackColor = ProductUi.Surface;
@@ -33,11 +33,6 @@ internal sealed class ProductCatalogControl : UserControl
             260,
             font: ProductUi.Bold16,
             foreColor: ProductUi.Ink);
-        var accountLabel = ProductUi.MakeLabel(
-            $"ผู้ใช้: {userName}",
-            DockStyle.Right,
-            210,
-            ContentAlignment.MiddleRight);
         var logoutButton = new Button
         {
             Text = "ออกจากระบบ",
@@ -48,7 +43,6 @@ internal sealed class ProductCatalogControl : UserControl
         };
         logoutButton.Click += (_, _) => LogoutRequested?.Invoke(this, EventArgs.Empty);
         header.Controls.Add(logoutButton);
-        header.Controls.Add(accountLabel);
         header.Controls.Add(title);
 
         var productsBody = new Panel
