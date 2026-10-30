@@ -1,0 +1,72 @@
+@MiniErp.Api_HostAddress = http://localhost:5285
+
+### Login with an existing user
+POST {{MiniErp.Api_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "name": "<username>",
+  "password": "<password>"
+}
+
+### Paste the accessToken from the login response below
+@accessToken = <paste-access-token-here>
+
+###
+GET {{MiniErp.Api_HostAddress}}/api/products
+Accept: application/json
+Authorization: Bearer {{accessToken}}
+
+###
+### Search products by SKU or product name (one search term)
+GET {{MiniErp.Api_HostAddress}}/api/products?search=SAMPLE
+Accept: application/json
+Authorization: ******
+
+###
+POST {{MiniErp.Api_HostAddress}}/api/products
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Sample product",
+  "sku": "SAMPLE-001",
+  "price": 100.00,
+  "stockQuantity": 10
+}
+
+### Read all product logs, newest first
+GET {{MiniErp.Api_HostAddress}}/api/products/logs
+Accept: application/json
+Authorization: ******
+
+### Read logs for one product
+GET {{MiniErp.Api_HostAddress}}/api/products/1/logs
+Accept: application/json
+Authorization: ******
+
+###
+PUT {{MiniErp.Api_HostAddress}}/api/products/1
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Updated product",
+  "sku": "SAMPLE-001",
+  "price": 125.00
+}
+
+###
+PUT {{MiniErp.Api_HostAddress}}/api/products/1/stock
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "stockQuantity": 7
+}
+
+###
+DELETE {{MiniErp.Api_HostAddress}}/api/products/1
+Authorization: Bearer {{accessToken}}
+
+###
