@@ -2,6 +2,8 @@
 
 Angular frontend for Mini ERP, generated with Angular CLI 21.
 
+The app has a login page, an inventory table with SKU/name search, product create/edit/detail pages, and global/per-product activity history. Product API requests use `/api`; the development server proxies them to `http://localhost:5285`.
+
 ## Requirements
 
 - Node.js 20.19.x, 22.12+, or 24+

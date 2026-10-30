@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using MiniErp.Api.Contracts;
 using MiniErp.Api.Data;
 using MiniErp.Api.Models;
 
@@ -37,26 +38,24 @@ public class ProductRepository(AppDbContext dbContext) : IProductRepository
             .SingleOrDefaultAsync(product => product.Id == id, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<ProductLog>> GetLogsAsync(
+    public async Task<IReadOnlyList<ProductLogResponse>> GetLogsAsync(
         CancellationToken cancellationToken)
     {
-        return await dbContext.ProductLogs
-            .AsNoTracking()
-            .OrderByDescending(log => log.CreatedAt)
-            .ThenByDescending(log => log.Id)
+        var logs = await ProjectLogs(dbContext.ProductLogs.AsNoTracking())
             .ToListAsync(cancellationToken);
+        return OrderLogs(logs);
     }
 
-    public async Task<IReadOnlyList<ProductLog>> GetLogsByProductIdAsync(
+    public async Task<IReadOnlyList<ProductLogResponse>> GetLogsByProductIdAsync(
         int productId,
         CancellationToken cancellationToken)
     {
-        return await dbContext.ProductLogs
-            .AsNoTracking()
-            .Where(log => log.ProductId == productId)
-            .OrderByDescending(log => log.CreatedAt)
-            .ThenByDescending(log => log.Id)
+        var logs = await ProjectLogs(
+                dbContext.ProductLogs
+                    .AsNoTracking()
+                    .Where(log => log.ProductId == productId))
             .ToListAsync(cancellationToken);
+        return OrderLogs(logs);
     }
 
     public Task<bool> SkuExistsAsync(
@@ -106,6 +105,37 @@ public class ProductRepository(AppDbContext dbContext) : IProductRepository
         await dbContext.ProductLogs.AddAsync(log, cancellationToken);
         dbContext.Products.Remove(product);
         await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private IQueryable<ProductLogResponse> ProjectLogs(IQueryable<ProductLog> logs)
+    {
+        return
+            from log in logs
+            join user in dbContext.Users.AsNoTracking() on log.UserId equals user.Id
+            join product in dbContext.Products.AsNoTracking()
+                on log.ProductId equals product.Id into products
+            from product in products.DefaultIfEmpty()
+            select new ProductLogResponse(
+                log.Id,
+                log.ProductId,
+                product == null ? null : product.Name,
+                product == null ? null : product.Sku,
+                log.UserId,
+                user.Name,
+                log.Type,
+                log.OldValue,
+                log.NewValue,
+                log.ChangeQuantity,
+                log.CreatedAt);
+    }
+
+    private static IReadOnlyList<ProductLogResponse> OrderLogs(
+        IEnumerable<ProductLogResponse> logs)
+    {
+        return logs
+            .OrderByDescending(log => log.CreatedAt)
+            .ThenByDescending(log => log.Id)
+            .ToList();
     }
 
 }

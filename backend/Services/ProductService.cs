@@ -19,21 +19,17 @@ public class ProductService(IProductRepository productRepository) : IProductServ
         return productRepository.GetByIdAsync(id, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<ProductLogResponse>> GetLogsAsync(
+    public Task<IReadOnlyList<ProductLogResponse>> GetLogsAsync(
         CancellationToken cancellationToken)
     {
-        var result = await productRepository.GetLogsAsync(cancellationToken);
-        return ToLogResponse(result);
+        return productRepository.GetLogsAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyList<ProductLogResponse>> GetLogsByProductIdAsync(
+    public Task<IReadOnlyList<ProductLogResponse>> GetLogsByProductIdAsync(
         int productId,
         CancellationToken cancellationToken)
     {
-        var result = await productRepository.GetLogsByProductIdAsync(
-            productId,
-            cancellationToken);
-        return ToLogResponse(result);
+        return productRepository.GetLogsByProductIdAsync(productId, cancellationToken);
     }
 
     public async Task<Product> CreateAsync(
@@ -207,19 +203,4 @@ public class ProductService(IProductRepository productRepository) : IProductServ
         };
     }
 
-    private static IReadOnlyList<ProductLogResponse> ToLogResponse(
-        IReadOnlyList<ProductLog> logs)
-    {
-        return logs
-            .Select(log => new ProductLogResponse(
-                log.Id,
-                log.ProductId,
-                log.UserId,
-                log.Type,
-                log.OldValue,
-                log.NewValue,
-                log.ChangeQuantity,
-                log.CreatedAt))
-            .ToList();
-    }
 }

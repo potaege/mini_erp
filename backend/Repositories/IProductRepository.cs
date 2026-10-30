@@ -1,4 +1,5 @@
 using MiniErp.Api.Models;
+using MiniErp.Api.Contracts;
 
 namespace MiniErp.Api.Repositories;
 
@@ -12,9 +13,9 @@ public interface IProductRepository
 
     Task<Product?> GetByIdForUpdateAsync(int id, CancellationToken cancellationToken);
 
-    Task<IReadOnlyList<ProductLog>> GetLogsAsync(CancellationToken cancellationToken);
+    Task<IReadOnlyList<ProductLogResponse>> GetLogsAsync(CancellationToken cancellationToken);
 
-    Task<IReadOnlyList<ProductLog>> GetLogsByProductIdAsync(
+    Task<IReadOnlyList<ProductLogResponse>> GetLogsByProductIdAsync(
         int productId,
         CancellationToken cancellationToken);
 
