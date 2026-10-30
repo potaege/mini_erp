@@ -94,3 +94,26 @@ http://localhost:5285/swagger
 ```sql
 INSERT INTO users (name, password) VALUES ('dev', 'change-me');
 ```
+
+## Web Application (Angular)
+
+Frontend อยู่ที่ `web\` พัฒนาด้วย Angular 21 และ Node.js
+
+### สิ่งที่ต้องมี
+- Node.js 20.19.x, 22.12+ หรือ 24+
+- npm
+
+### ติดตั้งและรัน
+
+```powershell
+cd web
+npm install
+npm start
+```
+
+เปิดเว็บที่ `http://localhost:4200` และใช้คำสั่งต่อไปนี้เพื่อ build หรือทดสอบ:
+
+```powershell
+npm run build
+npm test
+```
