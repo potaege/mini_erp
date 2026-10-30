@@ -62,7 +62,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         {
             entity.ToTable("product_logs");
             entity.HasKey(log => log.Id);
-            entity.HasIndex(log => new { log.ProductId, log.CreatedAt })
+            entity.HasIndex(log => new { log.CreatedAt, log.Id })
+                .HasDatabaseName("ix_logs_created_at");
+            entity.HasIndex(log => new { log.ProductId, log.CreatedAt, log.Id })
                 .HasDatabaseName("ix_logs_product");
             entity.HasIndex(log => log.UserId)
                 .HasDatabaseName("ix_logs_user");

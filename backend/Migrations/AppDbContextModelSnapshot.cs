@@ -135,7 +135,10 @@ namespace MiniErp.Api.Migrations
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_logs_user");
 
-                    b.HasIndex("ProductId", "CreatedAt")
+                    b.HasIndex("CreatedAt", "Id")
+                        .HasDatabaseName("ix_logs_created_at");
+
+                    b.HasIndex("ProductId", "CreatedAt", "Id")
                         .HasDatabaseName("ix_logs_product");
 
                     b.ToTable("product_logs", (string)null);

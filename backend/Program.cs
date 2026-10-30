@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
 using MiniErp.Api.Data;
 using MiniErp.Api.Repositories;
 using MiniErp.Api.Services;
@@ -60,6 +61,8 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference("/swagger", options =>
+        options.WithTitle("Mini ERP API"));
 }
 
 app.UseHttpsRedirection();

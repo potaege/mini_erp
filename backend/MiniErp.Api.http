@@ -18,6 +18,12 @@ Accept: application/json
 Authorization: Bearer {{accessToken}}
 
 ###
+### Search products by SKU or product name (one search term)
+GET {{MiniErp.Api_HostAddress}}/api/products?search=SAMPLE
+Accept: application/json
+Authorization: ******
+
+###
 POST {{MiniErp.Api_HostAddress}}/api/products
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
@@ -28,6 +34,16 @@ Authorization: Bearer {{accessToken}}
   "price": 100.00,
   "stockQuantity": 10
 }
+
+### Read all product logs, newest first
+GET {{MiniErp.Api_HostAddress}}/api/products/logs
+Accept: application/json
+Authorization: ******
+
+### Read logs for one product
+GET {{MiniErp.Api_HostAddress}}/api/products/1/logs
+Accept: application/json
+Authorization: ******
 
 ###
 PUT {{MiniErp.Api_HostAddress}}/api/products/1
