@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\file_comsi\\mini\\backend\\MiniErp.Api.csproj": {}
+    "c:\\file_comsi\\mini\\backend\\MiniErp.Api.csproj": {}
   },
   "projects": {
-    "C:\\file_comsi\\mini\\backend\\MiniErp.Api.csproj": {
+    "c:\\file_comsi\\mini\\backend\\MiniErp.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\file_comsi\\mini\\backend\\MiniErp.Api.csproj",
+        "projectUniqueName": "c:\\file_comsi\\mini\\backend\\MiniErp.Api.csproj",
         "projectName": "MiniErp.Api",
-        "projectPath": "C:\\file_comsi\\mini\\backend\\MiniErp.Api.csproj",
+        "projectPath": "c:\\file_comsi\\mini\\backend\\MiniErp.Api.csproj",
         "packagesPath": "C:\\Users\\potae\\.nuget\\packages\\",
-        "outputPath": "C:\\file_comsi\\mini\\backend\\obj\\",
+        "outputPath": "c:\\file_comsi\\mini\\backend\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\potae\\AppData\\Roaming\\NuGet\\NuGet.Config",

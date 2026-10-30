@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "SoCbOwBklTM=",
+  "dgSpecHash": "Ku+fKOJja5E=",
   "success": true,
-  "projectFilePath": "C:\\file_comsi\\mini\\backend\\MiniErp.Api.csproj",
+  "projectFilePath": "c:\\file_comsi\\mini\\backend\\MiniErp.Api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\potae\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\potae\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\10.0.14\\microsoft.aspnetcore.authentication.jwtbearer.10.0.14.nupkg.sha512",
