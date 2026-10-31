@@ -18,7 +18,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
         modelBuilder.Entity<Product>(entity =>
         {
-            entity.ToTable("products");
+            entity.ToTable("products", table =>
+            {
+                table.HasCheckConstraint("ck_products_price_nonnegative", "`price` >= 0");
+                table.HasCheckConstraint("ck_products_stock_nonnegative", "`stock_qty` >= 0");
+            });
             entity.HasKey(product => product.Id);
             entity.HasIndex(product => product.Sku)
                 .IsUnique()

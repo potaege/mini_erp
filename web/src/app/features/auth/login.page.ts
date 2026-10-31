@@ -20,7 +20,6 @@ const nonWhitespaceValidator: ValidatorFn = (
         </div>
         <p class="eyebrow">WELCOME BACK</p>
         <h1>เข้าสู่ระบบ</h1>
-        <p class="intro">ลงชื่อเข้าใช้เพื่อจัดการสินค้าและตรวจสอบประวัติ</p>
         @if (errorMessage()) {
           <div class="alert" role="alert">{{ errorMessage() }}</div>
         }

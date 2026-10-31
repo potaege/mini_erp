@@ -85,7 +85,12 @@ namespace MiniErp.Api.Migrations
                         .IsUnique()
                         .HasDatabaseName("uq_products_sku");
 
-                    b.ToTable("products", (string)null);
+                    b.ToTable("products", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_products_price_nonnegative", "`price` >= 0");
+
+                            t.HasCheckConstraint("ck_products_stock_nonnegative", "`stock_qty` >= 0");
+                        });
                 });
 
             modelBuilder.Entity("MiniErp.Api.Models.ProductLog", b =>

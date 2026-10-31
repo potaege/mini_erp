@@ -1,109 +1,83 @@
 # Mini ERP
 
-## แอปเดสก์ท็อป (app)
+## Setup
 
-แอปติดตั้งบนคอมพิวเตอร์ พัฒนาด้วย C# และ Windows Forms บน .NET 10 สำหรับ Windows
+ใช้ Windows, .NET 10 SDK, MySQL Server 8.0.16 ขึ้นไป, Node.js 20.19.x/22.12+/24+ และ npm
 
-โปรเจกต์อยู่ที่ `app\MiniErp.App.csproj`
+### Backend
+
+ก่อนเริ่ม ให้เปิด MySQL Server หากใช้ XAMPP ให้เปิด XAMPP Control Panel แล้วกด `Start` ที่แถว `MySQL` (ไม่ต้องเปิด Apache) จากนั้นเปิด MySQL Workbench เชื่อมต่อ Server โดยใช้พอร์ตเดียวกับที่จะกรอกในไฟล์ตั้งค่า:
+
+1. ที่แถบ `SCHEMAS` คลิกขวา แล้วเลือก `Create Schema...`
+2. ช่อง `Name` ใส่ `mini_erp` แล้วกด `Apply` → `Apply` → `Finish`
+3. สร้างเป็นฐานข้อมูลเปล่า ไม่ต้องสร้างตารางเอง
+
+เตรียม **ชื่อผู้ใช้และรหัสผ่านของ MySQL Server** ที่มีสิทธิ์สร้าง/แก้ไขตารางใน `mini_erp` ไว้ใช้ตอนตั้งค่า ชื่อนี้ไม่ใช่บัญชีทดสอบของเว็บ
+
+ทำตามลำดับ **ตั้งค่าฐานข้อมูล → บันทึกการเชื่อมต่อ → สร้างตารางและเปิด API**:
+
+#### ส่วนที่ 1: ตั้งค่าการเชื่อมต่อ MySQL
+
+**ใช้ไฟล์ตั้งค่า:** ดับเบิลคลิก `setup-db-connection.bat` ที่โฟลเดอร์หลักของโปรเจกต์ ครั้งแรกสคริปต์จะสร้างและเปิด `backend\db-connection.json` ใน Notepad ให้กรอกค่า:
+
+```json
+{
+  "server": "127.0.0.1",
+  "port": 3306,
+  "database": "mini_erp",
+  "userId": "root",
+  "password": "ใส่รหัสผ่าน MySQL ที่นี่"
+}
+```
+
+ใส่ชื่อผู้ใช้/รหัสผ่านที่ใช้เชื่อมต่อ MySQL Workbench; ถ้าไม่มีรหัสผ่านให้ใช้ `"password": ""` จากนั้นบันทึกและปิด Notepad สคริปต์จะอ่านไฟล์นี้และเก็บค่าการเชื่อมต่อกับ JWT key ไว้ใน User Secrets แล้วจบการทำงาน **ขั้นตอนนี้ยังไม่สร้างตารางหรือเปิด API**
+
+**ถ้าไฟล์ตั้งค่ามีอยู่แล้ว:** เปิด `backend\db-connection.json` ใน VS Code/Notepad แล้วตรวจหรือแก้ค่า จากนั้นดับเบิลคลิก `setup-db-connection.bat` เพื่อบันทึกค่าไว้ใน User Secrets โดยไม่ต้องพิมพ์รหัสผ่านใน Terminal ไฟล์นี้ถูก ignore โดย Git เพื่อไม่ส่งรหัสผ่านขึ้น repository
+
+#### ส่วนที่ 2: สร้างตาราง/ข้อมูลตัวอย่างและเปิด Backend
+
+**รัน Backend:** หลัง `setup-db-connection.bat` ทำงานสำเร็จแล้ว ให้ดับเบิลคลิก `setup-backend.bat` ที่โฟลเดอร์หลักของโปรเจกต์แยกอีกครั้ง ไฟล์นี้ไม่ถามรหัสผ่าน แต่ใช้ค่าที่บันทึกไว้เพื่อ restore dependencies, รัน EF migration สร้างตาราง `products`, `users`, `product_logs`, `__EFMigrationsHistory` และข้อมูลตัวอย่างใน `mini_erp` จากนั้นเปิด API ให้เปิดหน้าต่างนี้ค้างไว้ขณะใช้งาน; ปิดหน้าต่างเพื่อหยุด API
+
+ถ้าต้องการรันผ่าน PowerShell ให้เปิดที่โฟลเดอร์หลักของโปรเจกต์แล้วใช้:
 
 ```powershell
-dotnet run --project app\MiniErp.App.csproj
+.\setup-db-connection.bat
+.\setup-backend.bat
 ```
 
-หน้าจอหลักแยกเป็น `LoginForm` และ `ProductForm` โดย `MiniErpApplicationContext` เป็นตัวสลับหน้าต่างตามสถานะการเข้าสู่ระบบ
-`ProductForm` จัดการหน้าต่างและอายุ session ส่วน `ProductCatalogController` จัดการค้นหา/โหลดสินค้าและบันทึกสต็อกผ่าน `ProductsService`
+คำสั่งแรกใช้บันทึกค่าการเชื่อมต่อ (ครั้งแรกจะเปิด Notepad ให้กรอกไฟล์แล้วบันทึก/ปิด) ส่วนคำสั่งที่สองใช้สร้างตารางและเปิด API ซึ่งเปิดที่ `http://localhost:5285`; Swagger อยู่ที่ `http://localhost:5285/swagger`
 
-ส่วน UI แยกตามหน้าที่ไว้ใน `app\Controls\Products\`:
-
-- `ProductCatalogControl.cs` ประกอบหน้ารายการสินค้า
-- `ProductSearchControl.cs` ช่องค้นหาสินค้า
-- `ProductGridControl.cs` ตารางแสดงสินค้า
-- `ProductStockEditorControl.cs` ส่วนปรับจำนวนคงเหลือ
-
-ฟอร์ม Login ใช้ `app\Controls\Auth\LoginControl.cs` แยกจาก `LoginForm`
-
-ตั้งค่า URL หลักของ backend ที่ `app\appsettings.json` ใน `Api:BaseUrl` โดยค่าเริ่มต้นคือ `http://localhost:5285`
-หน้า Login ใช้ `POST /api/Auth/login` และส่ง `name` กับ `password`
-token จะเก็บไว้ในหน่วยความจำขณะเปิดแอปเท่านั้น ไม่บันทึกรหัสผ่านหรือ token ลงดิสก์
-เมื่อ token เหลือเวลาตาม `Authentication:WarningMinutes` แอปจะแสดง popup ให้เลือกอยู่ต่อหรือไม่อยู่ต่อ
-หากไม่ตอบจน token หมดอายุ แอปจะกลับไปหน้า Login โดยอัตโนมัติ
-การต่ออายุ token จริงต้องมี refresh-token endpoint จาก backend; API ปัจจุบันยังไม่มี endpoint นี้
-
-หลัง Login แอปโหลดรายการสินค้าจาก `GET /api/Products` และค้นหาชื่อหรือรหัสสินค้าผ่าน query `search`
-เลือกสินค้าเพื่อปรับจำนวนคงเหลือด้วย `PUT /api/Products/{id}/stock`
-การเรียก API ทำงานแบบ asynchronous พร้อมแสดงสถานะโหลดและข้อความเมื่อเชื่อมต่อหรือบันทึกไม่สำเร็จ
-
-## Backend API
-
-Backend API พัฒนาด้วย ASP.NET Core และ MariaDB
-
-### สิ่งที่ต้องมี
-- .NET 10 SDK
-- MariaDB ที่กำลังทำงานอยู่ (ค่าเริ่มต้น `127.0.0.1:3306`)
-
-### ติดตั้งและตั้งค่า
-
-เปิด PowerShell ที่โฟลเดอร์โปรเจกต์ แล้วเข้าโฟลเดอร์ backend:
-
-```powershell
-cd backend
-```
-
-สร้างฐานข้อมูล `mini_erp` ใน MariaDB ก่อน เช่น:
-
-```sql
-CREATE DATABASE mini_erp CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-```
-
-ตั้งค่า connection string และ JWT signing key ด้วย User Secrets (แทน `<db-user>` และ `<db-password>` ด้วยบัญชี MariaDB ของคุณ):
-
-```powershell
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=127.0.0.1;Port=3306;Database=mini_erp;User ID=<db-user>;Password=<db-password>"
-
-$bytes = [System.Security.Cryptography.RandomNumberGenerator]::GetBytes(32)
-$jwtKey = [Convert]::ToBase64String($bytes)
-dotnet user-secrets set "Jwt:SigningKey" $jwtKey
-```
-
-ติดตั้งเครื่องมือและ dependencies จากนั้นสร้างตารางด้วย migrations:
+**ป้อนคำสั่งเอง:** ใช้ PowerShell ที่โฟลเดอร์ `backend` หลังตั้งค่าการเชื่อมต่อในส่วนที่ 1 แล้วรัน:
 
 ```powershell
 dotnet tool restore
 dotnet restore
 dotnet tool run dotnet-ef -- database update
-```
-
-### รัน API
-
-```powershell
 dotnet run --launch-profile http
 ```
 
-API จะเปิดที่ `http://localhost:5285` ใน Development สามารถเปิดหน้า API docs ได้ที่:
+**กรณีขึ้น `Table 'products' already exists`:** มีตาราง `products` อยู่ก่อน แต่ Migration ยังสร้าง schema ที่ต้องการไม่สำเร็จ อาจเป็นตารางเก่าหรือ Migration ที่หยุดค้าง อย่าลบฐานข้อมูลหากมีข้อมูลที่ต้องเก็บไว้ ให้สำรองและตรวจฐานข้อมูลก่อน หากเป็นฐานข้อมูลทดลองที่ลบได้ ให้ลบ schema `mini_erp` ใน MySQL Workbench แล้วสร้าง schema เปล่าชื่อเดิม จากนั้นรัน `setup-backend.bat` อีกครั้ง Migration จะสร้างตารางให้เอง ไม่ต้องสร้างตารางด้วยมือ
 
-```text
-http://localhost:5285/swagger
-```
+#### เปิดใช้งานครั้งถัดไป (ไม่ต้อง Setup ซ้ำ)
 
-หากเชื่อมต่อฐานข้อมูลไม่ได้ ให้ตรวจว่า MariaDB ทำงานอยู่ และ host, port, ชื่อฐานข้อมูล และบัญชีใน connection string ถูกต้อง หาก API ทำงานใน Docker ให้ใช้ชื่อ service ของ MariaDB แทน `127.0.0.1`
+หลังทำขั้นตอนตั้งค่าฐานข้อมูลและสร้างตารางครั้งแรกแล้ว การใช้งานปกติ **ไม่ต้องรัน `setup-db-connection.bat`, `setup-backend.bat`, สร้าง schema หรือ `npm install` ซ้ำ**
 
-### เริ่มใช้งาน
+1. เปิด MySQL Server (ถ้าใช้ XAMPP ให้กด `Start` ที่ `MySQL`)
+2. เปิด PowerShell ที่โฟลเดอร์ `backend` แล้วรัน `dotnet run --launch-profile http` เพื่อเปิด API ที่ `http://localhost:5285` ทิ้งหน้าต่างนี้ไว้
+3. ถ้าจะใช้ Web ให้เปิด PowerShell อีกหน้าต่างที่โฟลเดอร์ `web` แล้วรัน `npm start` เข้าเว็บที่ `http://localhost:4200`
+4. ถ้าจะใช้ Windows Forms ให้เปิด PowerShell อีกหน้าต่างที่โฟลเดอร์หลัก แล้วรัน `dotnet run --project app\MiniErp.App.csproj`
 
-ไม่มี endpoint สมัครผู้ใช้ หลังรัน migration แล้ว ให้เพิ่มผู้ใช้สำหรับทดสอบในฐานข้อมูลก่อน ตัวอย่าง:
+ปิดหน้าต่างของแต่ละโปรแกรมเพื่อหยุดการทำงาน ใช้ `setup-backend.bat` อีกครั้งเฉพาะเมื่อมี Migration ใหม่ที่ต้องนำไปใช้ และใช้ `setup-db-connection.bat` อีกครั้งเมื่อเปลี่ยนการตั้งค่าฐานข้อมูล
 
-```sql
-INSERT INTO users (name, password) VALUES ('dev', 'change-me');
-```
+### Web Application
 
-## Web Application (Angular)
+**วิธีที่ 1: ใช้ไฟล์ BAT**
 
-Frontend อยู่ที่ `web\` พัฒนาด้วย Angular 21 และ Node.js
+หลังเปิด Backend แล้ว ให้ดับเบิลคลิก `setup-web.bat` ที่โฟลเดอร์หลักของโปรเจกต์ สคริปต์จะติดตั้ง npm dependencies แล้วเปิด Angular development server; เปิดหน้าต่างนี้ค้างไว้และเข้าเว็บที่ `http://localhost:4200`
 
-### สิ่งที่ต้องมี
-- Node.js 20.19.x, 22.12+ หรือ 24+
-- npm
+**วิธีที่ 2: ป้อนคำสั่งเอง**
 
-### ติดตั้งและรัน
+หรือเปิด PowerShell อีกหน้าต่างที่โฟลเดอร์หลักของโปรเจกต์ แล้วรัน:
 
 ```powershell
 cd web
@@ -111,11 +85,130 @@ npm install
 npm start
 ```
 
-เปิดเว็บที่ `http://localhost:4200` และใช้คำสั่งต่อไปนี้เพื่อ build หรือทดสอบ:
+### Windows Forms Desktop App
+
+เมื่อ Backend เปิดอยู่ ให้เปิด PowerShell ที่โฟลเดอร์หลักของโปรเจกต์ในอีกหน้าต่าง แล้วรัน:
 
 ```powershell
-npm run build
-npm test
+dotnet run --project app\MiniErp.App.csproj
 ```
 
-เว็บมีหน้า Login, หน้ารายการสินค้า (ค้นหาด้วยชื่อหรือ SKU), เพิ่ม/แก้ไข/ลบสินค้า และหน้าประวัติการเปลี่ยนแปลงทั้งแบบรวมและรายสินค้า ระหว่างพัฒนาจะ proxy `/api` ไปที่ `http://localhost:5285` ดังนั้นให้เปิด backend ไว้พร้อมกัน
+ถ้า Backend ไม่ได้เปิดที่ `http://localhost:5285` ให้แก้ `Api:BaseUrl` ใน `app\appsettings.json`
+
+## เวอร์ชันเครื่องมือ
+
+เวอร์ชันที่ใช้ตรวจสอบในสภาพแวดล้อมพัฒนา:
+
+| เครื่องมือ | เวอร์ชัน |
+|---|---|
+| .NET SDK | 10.0.403 |
+| Node.js | 20.19.2 |
+| npm | 10.8.2 |
+| Git for Windows | 2.38.1 |
+| Angular | 21 (dependencies ระบุ `^21.2.0`) |
+| EF Core / Pomelo MySQL provider / dotnet-ef | 9.0.0 |
+| MySQL Server | ตั้งค่าให้รองรับ 8.0.16 ขึ้นไป |
+
+เวอร์ชัน .NET, Node.js และ npm ในตารางเป็นเวอร์ชันที่ตรวจพบในเครื่องพัฒนา ส่วน MySQL Server เป็นเวอร์ชันขั้นต่ำที่ Backend กำหนดไว้
+
+## โครงสร้างโปรเจกต์และเหตุผลในการออกแบบ
+
+- `backend\` — ASP.NET Core Web API แบ่ง Controller รับ HTTP request, Service จัดการกฎของสินค้า, Repository ติดต่อฐานข้อมูล และ EF Core migrations สร้าง/ปรับ schema การให้ Web และ Windows Forms ใช้ API เดียวกันทำให้ใช้ข้อมูลชุดเดียวและไม่เปิดการเชื่อมต่อฐานข้อมูลจากหน้าจอโดยตรง
+- `web\src\app\core\` — service, model และส่วนกลางที่ใช้ร่วมกัน; `features\` แบ่งหน้าตามงาน เช่น products, auth และ logs ช่วยให้โค้ดของแต่ละหน้าจัดการเป็นส่วน ๆ
+- `app\` — Windows Forms; แยก Form, Controls, Controller และ Service เพื่อแยกหน้าจอออกจากการเรียก API
+- ตาราง `product_logs` เก็บประวัติการเปลี่ยนแปลงสินค้าและจำนวนคงเหลือ เพื่อให้ตรวจสอบย้อนหลังได้
+
+## วิธีทดสอบและผลที่ตรวจสอบแล้ว
+
+ทดสอบการใช้งานฟังก์ชันต่าง ๆ ผ่าน Web และ Windows Forms โดยทดลองทำรายการตามการใช้งานจริง และตรวจสอบข้อมูลในฐานข้อมูลกับตาราง `product_logs` หลังทำรายการ ผลที่ตรวจพบคือข้อมูลสินค้าและประวัติ log เปลี่ยนแปลงสอดคล้องกับรายการที่ทำจากทั้งสองแอป
+
+## ข้อจำกัดและแนวทางพัฒนาต่อ
+
+- รหัสผ่านผู้ใช้ตัวอย่างเก็บเป็นข้อความธรรมดา เหมาะสำหรับทดลองในเครื่องเท่านั้น ควรเปลี่ยนเป็น password hashing ก่อนใช้งานจริง
+- ยังไม่มี refresh-token; เมื่อ JWT หมดอายุ ผู้ใช้ต้องเข้าสู่ระบบใหม่
+- ยังไม่มี automated integration tests สำหรับ API/ฐานข้อมูล และยังไม่มี pagination สำหรับรายการสินค้าขนาดใหญ่
+- แนวทางต่อยอด: เพิ่ม password hashing และ refresh-token, เพิ่ม integration tests และ pagination, และเพิ่มการตรวจ concurrency เพื่อป้องกันการเขียนทับข้อมูลเมื่อหลายคนแก้พร้อมกัน
+
+## เวลาที่ใช้พัฒนา
+
+เวลาที่ใช้จริงโดยประมาณ: **12 ชั่วโมง**
+
+## การใช้ AI
+
+ใช้ AI ช่วยตรวจเทียบข้อกำหนด แก้ไขเอกสาร README และช่วยปรับปรุงโค้ด/สคริปต์ setup ผู้สมัครตรวจสอบการทำงานและทดสอบแอปด้วยตนเอง
+
+## รันอย่างเดียว (หลัง Setup ครั้งแรกแล้ว)
+
+ทุกครั้งที่ต้องการใช้งาน ให้เปิด MySQL ก่อน (ถ้าใช้ XAMPP กด `Start` ที่ `MySQL`) แล้วเปิดโปรแกรมตามต้องการ โดย **ไม่ต้องรัน setup, migration หรือ `npm install` ซ้ำ**
+
+**หน้าต่างที่ 1 — Backend API** เปิด PowerShell ที่โฟลเดอร์โปรเจกต์:
+
+```powershell
+cd backend
+dotnet run --launch-profile http
+```
+
+**หน้าต่างที่ 2 — Web** เปิด PowerShell อีกหน้าต่างที่โฟลเดอร์โปรเจกต์:
+
+```powershell
+cd web
+npm start
+```
+
+เข้าใช้งาน Web ที่ `http://localhost:4200` และ API ที่ `http://localhost:5285/swagger`
+
+**ถ้าจะใช้ Windows Forms แทนหรือเพิ่มด้วย** เปิด PowerShell อีกหน้าต่างที่โฟลเดอร์โปรเจกต์:
+
+```powershell
+dotnet run --project app\MiniErp.App.csproj
+```
+
+## ภาพหน้าจอการทำงาน
+
+### Web
+
+**หน้าเข้าสู่ระบบ**
+
+![Web login](docs/screenshots/web-login.png)
+
+**รายการสินค้า**
+
+![Web product list](docs/screenshots/web-products.png)
+
+**ประวัติการเปลี่ยนแปลง**
+
+![Web product history](docs/screenshots/web-product-history.png)
+
+**เพิ่มสินค้า**
+
+![Web add product](docs/screenshots/web-add-product.png)
+
+**รายละเอียดสินค้า**
+
+![Web product detail](docs/screenshots/web-product-detail.png)
+
+**ยืนยันการลบสินค้า**
+
+![Web delete confirmation](docs/screenshots/web-delete-confirmation.png)
+
+**แก้ไขสินค้า**
+
+![Web edit product](docs/screenshots/web-edit-product.png)
+
+### App (Windows Forms)
+
+**หน้าเข้าสู่ระบบ**
+
+![App login](docs/screenshots/app-login.png)
+
+**รายการสินค้าทั้งหมด**
+
+![App product list](docs/screenshots/app-product-list.png)
+
+**ค้นหาสินค้า**
+
+![App product search](docs/screenshots/app-products.png)
+
+**ปรับจำนวนคงเหลือ**
+
+![App stock update](docs/screenshots/app-stock-update.png)

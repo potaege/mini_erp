@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException(
         "Connection string 'DefaultConnection' is not configured.");
-var serverVersion = new MariaDbServerVersion(new Version(10, 4, 27));
+var serverVersion = new MySqlServerVersion(new Version(8, 0, 16));
 var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>()
     ?? throw new InvalidOperationException("JWT settings are not configured.");
 if (string.IsNullOrWhiteSpace(jwtSettings.Issuer)

@@ -41,7 +41,7 @@ const nonWhitespaceValidator: ValidatorFn = (
       }
       @if (isLoading()) {
         <div class="card loading">กำลังโหลดข้อมูลสินค้า...</div>
-      } @else {
+      } @else if (!isEditMode() || !errorMessage()) {
         <form class="card product-form" [formGroup]="form" (ngSubmit)="save()">
           <div class="form-section-title">รายละเอียดสินค้า</div>
           <div class="form-field">
@@ -67,11 +67,11 @@ const nonWhitespaceValidator: ValidatorFn = (
           </div>
           <div class="form-field">
             <label for="price">ราคาต่อหน่วย <span class="required">*</span></label>
-            <div class="input-with-suffix"><input id="price" type="number" formControlName="price" min="0.01" max="9999999999.99" step="0.01" placeholder="0.00"><span>บาท</span></div>
+            <div class="input-with-suffix"><input id="price" type="number" formControlName="price" min="0" max="9999999999.99" step="0.01" placeholder="0.00"><span>บาท</span></div>
             @if (form.controls.price.touched && form.controls.price.invalid) {
               <span class="field-error">
                 @if (form.controls.price.hasError('decimalPlaces')) { ราคาต้องมีทศนิยมไม่เกิน 2 ตำแหน่ง }
-                @else { ราคาต้องมากกว่า 0 และไม่เกิน 9,999,999,999.99 บาท }
+                @else { ราคาต้องไม่ติดลบและไม่เกิน 9,999,999,999.99 บาท }
               </span>
             }
           </div>
@@ -126,7 +126,7 @@ export class ProductFormPage implements OnInit {
     sku: ['', [Validators.required, Validators.maxLength(50), nonWhitespaceValidator]],
     price: [0, [
       Validators.required,
-      Validators.min(0.01),
+      Validators.min(0),
       Validators.max(9999999999.99),
       moneyValidator,
     ]],
@@ -144,6 +144,7 @@ export class ProductFormPage implements OnInit {
       return;
     }
 
+    this.isEditMode.set(true);
     const id = Number(idValue);
     if (!Number.isInteger(id) || id < 1) {
       this.errorMessage.set('ไม่พบรหัสสินค้า');
@@ -151,7 +152,6 @@ export class ProductFormPage implements OnInit {
     }
 
     this.productId.set(id);
-    this.isEditMode.set(true);
     this.isLoading.set(true);
     this.productsService.getById(id).subscribe({
       next: (product) => {
